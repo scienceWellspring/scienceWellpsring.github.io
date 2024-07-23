@@ -1,8 +1,7 @@
-const CLIENT_ID = '637088412101-furdfq5r6cbg31f6kkt2g9n2cr7k9kit.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyDfGOC10awrLoJJZnDxexGNqEp5Tac7Eyk';
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-const SPREADSHEET_ID = '15EpnaUc9XztfPNtPAYAjorv2j87Lb9sIlAFdTpS1mJE';
-const SHEET_NAME = 'data_lab';
+const SHEET_ID = '15EpnaUc9XztfPNtPAYAjorv2j87Lb9sIlAFdTpS1mJE';
+const SHEET_NAME = 'ICT_lab';
+const SHEET_URL = `https://script.google.com/macros/s/AKfycbxkkvXZsUWM9QuCDlApfUS0vM_STX5vu0txStRIspP1OHuzNvkaruZPWHlDaS6JGOLY/exec`;
 
 const roomBookings = [
     { room: 'ICT Lab 1', bookings: [] },
@@ -12,72 +11,34 @@ const roomBookings = [
 ];
 
 let bookedIctLabs = [];
-let gapiInited = false;
-let gisInited = false;
-let tokenClient;
 
 document.addEventListener('DOMContentLoaded', () => {
     setMinDate();
     renderBookingTable();
-    // gapi will be initialized in onLoadCallback function
+    loadSheetData();
 });
 
-function onLoadCallback() {
-    gapi.load('client:auth2', () => {
-        gapi.client.init({
-            apiKey: API_KEY,
-            clientId: CLIENT_ID,
-            scope: SCOPES
-        }).then(() => {
-            gapiInited = true;
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: (response) => {
-                    if (response.error) {
-                        console.error('Error during authentication:', response.error);
-                        return;
-                    }
-                    loadSheetData();
-                },
-            });
-            google.accounts.id.initialize({
-                client_id: CLIENT_ID,
-                callback: handleCredentialResponse
-            });
-            google.accounts.id.prompt(); // Display the One Tap UI
-        }).catch(error => {
-            console.error('Lỗi khi khởi tạo GAPI client:', error);
-        });
-    });
-}
-
-function handleCredentialResponse(response) {
-    if (response.credential) {
-        tokenClient.requestAccessToken({ prompt: '' });
-    }
-}
-
 function loadSheetData() {
-    if (!gapiInited) return;
-    gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: SHEET_NAME,
-    }).then(response => {
-        const rows = response.result.values;
-        if (rows && rows.length > 1) {
-            bookedIctLabs.length = 0;
-            rows.slice(1).forEach(row => {
-                const [name, room, date, period] = row;
-                if (name && room && date && period) {
-                    bookedIctLabs.push({ name, room, date, period });
-                }
-            });
-            renderBookedTable();
-        }
-    }).catch(error => {
-        console.error('Lỗi khi tải dữ liệu từ bảng tính:', error);
-    });
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched data:', data);
+            const rows = data.values;
+            if (rows && rows.length > 1) {
+                bookedIctLabs = []; // Clear old data
+                rows.slice(1).forEach(row => { // Skip header row
+                    const [name, room, date, period] = row;
+                    if (name && room && date && period) {
+                        bookedIctLabs.push({ name, room, date, period });
+                    }
+                });
+                console.log('Booked ICT Labs:', bookedIctLabs);
+                renderBookedTable();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading data from the sheet:', error);
+        });
 }
 
 function setMinDate() {
@@ -90,41 +51,27 @@ function setMinDate() {
     dateInput.setAttribute('min', today);
 }
 
-function saveToSheet(name, room, date, period) {
-    if (!gapiInited) return;
-    const values = [[name, room, date, period]];
-    gapi.client.sheets.spreadsheets.values.append({
-        spreadsheetId: SPREADSHEET_ID,
-        range: SHEET_NAME,
-        valueInputOption: 'RAW',
-        resource: { values },
-    }).then(response => {
-        console.log('Data saved to sheet:', response);
-    }).catch(error => {
-        console.error('Lỗi khi lưu dữ liệu vào bảng tính:', error);
-    });
+function saveToSheet(name, room, date, period, action) {
+    const data = new URLSearchParams();
+    data.append('name', name);
+    data.append('room', room);
+    data.append('date', date);
+    data.append('period', period);
+    data.append('action', action);
+
+    fetch(SHEET_URL, {
+        method: 'POST',
+        body: data
+    }).then(response => response.json())
+      .then(result => {
+          console.log('Data saved to sheet:', result);
+      }).catch(error => {
+          console.error('Error saving data to sheet:', error);
+      });
 }
 
 function removeFromSheet(name, room, date, period) {
-    if (!gapiInited) return;
-    gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: SHEET_NAME,
-    }).then(response => {
-        const values = response.result.values.filter(row => !(row[0] === name && row[1] === room && row[2] === date && row[3] === period));
-        gapi.client.sheets.spreadsheets.values.update({
-            spreadsheetId: SPREADSHEET_ID,
-            range: SHEET_NAME,
-            valueInputOption: 'RAW',
-            resource: { values },
-        }).then(response => {
-            console.log('Sheet updated:', response);
-        }).catch(error => {
-            console.error('Lỗi khi cập nhật bảng tính:', error);
-        });
-    }).catch(error => {
-        console.error('Lỗi khi lấy dữ liệu từ bảng tính:', error);
-    });
+    saveToSheet(name, room, date, period, 'remove');
 }
 
 function renderBookingTable() {
@@ -167,7 +114,7 @@ function bookIctLab(room, date, period, name) {
     bookedIctLabs.push({ room, date, period, name });
     renderBookingTable();
     renderBookedTable();
-    saveToSheet(name, room, date, period);
+    saveToSheet(name, room, date, period, 'add');
 }
 
 function getDayOfWeek(date) {
