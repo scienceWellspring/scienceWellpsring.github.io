@@ -1,7 +1,7 @@
 const API_KEY = 'AIzaSyDfGOC10awrLoJJZnDxexGNqEp5Tac7Eyk';
 const SHEET_ID = '15EpnaUc9XztfPNtPAYAjorv2j87Lb9sIlAFdTpS1mJE';
 const SHEET_NAME = 'ICT_lab';
-const SHEET_URL = `https://script.google.com/macros/s/AKfycbxkkvXZsUWM9QuCDlApfUS0vM_STX5vu0txStRIspP1OHuzNvkaruZPWHlDaS6JGOLY/exec`;
+const SHEET_URL = `https://script.google.com/macros/s/AKfycbyHZhOQ2fn-HeNOL_pvumRYUuMMHSMWwy9nfVtpn-wTGuki4nwQCjhi84nkzJZv7UP8/exec`;
 
 const roomBookings = [
     { room: 'ICT Lab 1', bookings: [] },
@@ -34,6 +34,7 @@ function loadSheetData() {
                 });
                 console.log('Booked ICT Labs:', bookedIctLabs);
                 renderBookedTable();
+                renderBookingTable(); // Update availability after loading data
             }
         })
         .catch(error => {
@@ -57,7 +58,7 @@ function saveToSheet(name, room, date, period, action) {
     data.append('room', room);
     data.append('date', date);
     data.append('period', period);
-    data.append('action', action);
+    data.append('status', action);
 
     fetch(SHEET_URL, {
         method: 'POST',
@@ -88,7 +89,7 @@ function renderBookingTable() {
 
         daysOfWeek.forEach(day => {
             const dayCell = document.createElement('td');
-            const bookings = room.bookings.filter(booking => booking.day === day);
+            const bookings = bookedIctLabs.filter(booking => booking.room === room.room && getDayOfWeek(booking.date) === day);
             if (bookings.length === 0) {
                 dayCell.textContent = 'Available';
             } else {
@@ -102,19 +103,17 @@ function renderBookingTable() {
 }
 
 function bookIctLab(room, date, period, name) {
-    const roomBooking = roomBookings.find(b => b.room === room);
     const day = getDayOfWeek(date);
 
-    if (roomBooking.bookings.some(booking => booking.day === day && booking.period === period)) {
+    if (bookedIctLabs.some(booking => booking.room === room && booking.date === date && booking.period === period)) {
         alert(`${room} is not available for the selected day and period.`);
         return;
     }
 
-    roomBooking.bookings.push({ day, date, period, name });
     bookedIctLabs.push({ room, date, period, name });
     renderBookingTable();
     renderBookedTable();
-    saveToSheet(name, room, date, period, 'add');
+    saveToSheet(name, room, date, period, 'active');
 }
 
 function getDayOfWeek(date) {
@@ -145,10 +144,6 @@ function cancelBooking(name, room, date, period) {
         return;
     }
 
-    const roomBooking = roomBookings.find(b => b.room === room);
-    const day = getDayOfWeek(date);
-
-    roomBooking.bookings = roomBooking.bookings.filter(b => !(b.day === day && b.period === period && b.name === name));
     bookedIctLabs = bookedIctLabs.filter(b => !(b.room === room && b.date === date && b.period === period && b.name === name));
 
     renderBookingTable();
