@@ -23,31 +23,41 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializeGapiClient() {
-    google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: handleCredentialResponse
-    });
-    google.accounts.id.prompt();  // Display the One Tap UI
-}
-
-function handleCredentialResponse(response) {
-    // Extract the token from the response and set it for GAPI
-    const token = response.credential;
-    gapi.load('client', () => {
+    gapi.load('client:auth2', () => {
         gapi.client.init({
             apiKey: API_KEY,
-            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+            clientId: CLIENT_ID,
+            scope: SCOPES
         }).then(() => {
             gapiInited = true;
-            gapi.auth.setToken({ access_token: token });
-            loadSheetData();
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: '', // Define later
+            });
+            tokenClient.callback = (response) => {
+                if (response.error !== undefined) {
+                    throw(response);
+                }
+                loadSheetData();
+            };
+            google.accounts.id.initialize({
+                client_id: CLIENT_ID,
+                callback: handleCredentialResponse
+            });
+            google.accounts.id.prompt(); // Display the One Tap UI
         }).catch(error => {
             console.error('Lỗi khi khởi tạo GAPI client:', error);
         });
     });
 }
 
+function handleCredentialResponse(response) {
+    tokenClient.requestAccessToken({ prompt: '' });
+}
+
 function loadSheetData() {
+    if (!gapiInited) return;
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
         range: SHEET_NAME,
@@ -79,10 +89,7 @@ function setMinDate() {
 }
 
 function saveToSheet(name, room, date, period) {
-    if (!gapi.auth.getToken()) {
-        return;
-    }
-
+    if (!gapiInited) return;
     const values = [[name, room, date, period]];
     gapi.client.sheets.spreadsheets.values.append({
         spreadsheetId: SPREADSHEET_ID,
@@ -97,10 +104,7 @@ function saveToSheet(name, room, date, period) {
 }
 
 function removeFromSheet(name, room, date, period) {
-    if (!gapi.auth.getToken()) {
-        return;
-    }
-
+    if (!gapiInited) return;
     gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
         range: SHEET_NAME,
