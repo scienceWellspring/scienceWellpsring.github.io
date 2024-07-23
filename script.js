@@ -19,10 +19,10 @@ let tokenClient;
 document.addEventListener('DOMContentLoaded', () => {
     setMinDate();
     renderBookingTable();
-    initializeGapiClient();
+    // gapi will be initialized in onLoadCallback function
 });
 
-function initializeGapiClient() {
+function onLoadCallback() {
     gapi.load('client:auth2', () => {
         gapi.client.init({
             apiKey: API_KEY,
@@ -33,14 +33,14 @@ function initializeGapiClient() {
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: CLIENT_ID,
                 scope: SCOPES,
-                callback: '', // Define later
+                callback: (response) => {
+                    if (response.error) {
+                        console.error('Error during authentication:', response.error);
+                        return;
+                    }
+                    loadSheetData();
+                },
             });
-            tokenClient.callback = (response) => {
-                if (response.error !== undefined) {
-                    throw(response);
-                }
-                loadSheetData();
-            };
             google.accounts.id.initialize({
                 client_id: CLIENT_ID,
                 callback: handleCredentialResponse
@@ -53,7 +53,9 @@ function initializeGapiClient() {
 }
 
 function handleCredentialResponse(response) {
-    tokenClient.requestAccessToken({ prompt: '' });
+    if (response.credential) {
+        tokenClient.requestAccessToken({ prompt: '' });
+    }
 }
 
 function loadSheetData() {
