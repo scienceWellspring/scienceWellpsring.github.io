@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICT Lab Reservation System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header>
+    <h1>ICT Lab Reservation System</h1>
+  </header>
+
+  <main>
+    <section class="table-section">
+      <h2>Availability</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ICT Lab</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTable">
+          <!-- Room booking data will be added dynamically here -->
+        </tbody>
+      </table>
+    </section>
+
+    <section class="form-section">
+      <h2>Book an ICT Lab</h2>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="room">ICT Lab:</label>
+          <select id="room" name="room" required>
+            <option value="">Select an ICT Lab</option>
+            <option value="ICT Lab 1">ICT Lab 1</option>
+            <option value="ICT Lab 2">ICT Lab 2</option>
+            <option value="ICT Lab 3">ICT Lab 3</option>
+            <option value="ICT Lab 4">ICT Lab 4</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="date">Date:</label>
+          <input type="date" id="date" name="date" required>
+        </div>
+
+        <div class="form-group">
+          <label for="period">Period:</label>
+          <select id="period" name="period" required>
+            <option value="1-2">1-2</option>
+            <option value="2-3">2-3</option>
+            <option value="4-5">4-5</option>
+            <option value="6-7">6-7</option>
+            <option value="8-9">8-9</option>
+          </select>
+        </div>
+
+        <button type="submit">Book ICT Lab</button>
+      </form>
+    </section>
+
+    <section class="table-section">
+      <h2>Booked ICT Labs</h2>
+      <table id="bookedTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>ICT Lab</th>
+            <th>Date</th>
+            <th>Period</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Booked ICT Labs will be added dynamically here -->
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
