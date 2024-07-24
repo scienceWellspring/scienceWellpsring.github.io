@@ -1,7 +1,8 @@
 const API_KEY = 'AIzaSyDfGOC10awrLoJJZnDxexGNqEp5Tac7Eyk';
 const SHEET_ID = '15EpnaUc9XztfPNtPAYAjorv2j87Lb9sIlAFdTpS1mJE';
 const SHEET_NAME = 'ICT_lab';
-const SHEET_URL = `https://script.google.com/macros/s/AKfycbyHZhOQ2fn-HeNOL_pvumRYUuMMHSMWwy9nfVtpn-wTGuki4nwQCjhi84nkzJZv7UP8/exec`;
+const Deployment_ID = 'AKfycbz6xxBlJlw1ZrCCNa79dRevGlJCBrZZB_JxKN53BJijOxvWLm_8mQHITGuW0yD9uART';
+const SHEET_URL = `https://script.google.com/macros/s/${Deployment_ID}/exec`;
 
 const roomBookings = [
     { room: 'ICT Lab 1', bookings: [] },
