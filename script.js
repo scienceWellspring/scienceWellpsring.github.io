@@ -33,7 +33,7 @@ function loadSheetData() {
                 rows.slice(1).forEach(row => { // Skip header row
                     const [name, room, date, period] = row;
                     if (name && room && date && period) {
-                        bookedIctLabs.push({ name, room, date, period });
+                        bookedIctLabs.push({ name, room, date: formatDate(date), period });
                     }
                 });
                 console.log('Booked ICT Labs:', bookedIctLabs);
@@ -84,7 +84,7 @@ function saveToSheet(name, room, date, period, action) {
     const data = new URLSearchParams();
     data.append('name', name);
     data.append('room', room);
-    data.append('date', date);
+    data.append('date', formatDate(date));
     data.append('period', period);
     data.append('status', action);
 
@@ -130,18 +130,26 @@ function renderBookingTable() {
     });
 }
 
-function bookIctLab(room, date, period, name) {
-    const day = getDayOfWeek(date);
+function formatDate(date) {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${month}/${day}/${year}`;
+}
 
-    if (bookedIctLabs.some(booking => booking.room === room && booking.date === date && booking.period === period)) {
+function bookIctLab(room, date, period, name) {
+    const formattedDate = formatDate(date);
+
+    if (bookedIctLabs.some(booking => booking.room === room && booking.date === formattedDate && booking.period === period)) {
         alert(`${room} is not available for the selected day and period.`);
         return;
     }
 
-    bookedIctLabs.push({ room, date, period, name });
+    bookedIctLabs.push({ room, date: formattedDate, period, name });
     renderBookingTable();
     renderBookedTable();
-    saveToSheet(name, room, date, period, 'active');
+    saveToSheet(name, room, formattedDate, period, 'active');
 }
 
 function getDayOfWeek(date) {
