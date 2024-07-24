@@ -1,6 +1,7 @@
 const API_KEY = 'AIzaSyDfGOC10awrLoJJZnDxexGNqEp5Tac7Eyk';
 const SHEET_ID = '15EpnaUc9XztfPNtPAYAjorv2j87Lb9sIlAFdTpS1mJE';
 const SHEET_NAME = 'ICT_lab';
+const ADMIN_SHEET_NAME = 'admin_account_data';
 const Deployment_ID = 'AKfycbz6xxBlJlw1ZrCCNa79dRevGlJCBrZZB_JxKN53BJijOxvWLm_8mQHITGuW0yD9uART';
 const SHEET_URL = `https://script.google.com/macros/s/${Deployment_ID}/exec`;
 
@@ -12,11 +13,13 @@ const roomBookings = [
 ];
 
 let bookedIctLabs = [];
+let isAdmin = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     setMinDate();
     renderBookingTable();
     loadSheetData();
+    checkAdmin();
 });
 
 function loadSheetData() {
@@ -40,6 +43,30 @@ function loadSheetData() {
         })
         .catch(error => {
             console.error('Error loading data from the sheet:', error);
+        });
+}
+
+function checkAdmin() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userName = urlParams.get('user_name');
+    const pass = urlParams.get('pass');
+
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${ADMIN_SHEET_NAME}?key=${API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+            const rows = data.values;
+            if (rows && rows.length > 1) {
+                rows.slice(1).forEach(row => { // Skip header row
+                    const [number, adminUserName, adminPass] = row;
+                    if (adminUserName === userName && adminPass === pass) {
+                        isAdmin = true;
+                    }
+                });
+                renderBookedTable();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking admin credentials:', error);
         });
 }
 
@@ -134,13 +161,30 @@ function renderBookedTable() {
             <td>${booking.room}</td>
             <td>${booking.date}</td>
             <td>${booking.period}</td>
-            <td><button onclick="cancelBooking('${booking.name}', '${booking.room}', '${booking.date}', '${booking.period}')">Cancel</button></td>
+            <td>
+                <button class="cancelButton ${isAdmin ? '' : 'disabled'}" onclick="cancelBooking('${booking.name}', '${booking.room}', '${booking.date}', '${booking.period}')">
+                    Cancel
+                </button>
+            </td>
         `;
         bookedTable.appendChild(row);
     });
+
+    const cancelButtons = bookedTable.getElementsByClassName('cancelButton');
+    for (let button of cancelButtons) {
+        if (!isAdmin) {
+            button.disabled = true;
+            button.title = 'You do not have permission to cancel this booking';
+        }
+    }
 }
 
 function cancelBooking(name, room, date, period) {
+    if (!isAdmin) {
+        alert('You do not have permission to cancel this booking.');
+        return;
+    }
+
     if (!confirm('Are you sure you want to cancel this booking?')) {
         return;
     }
