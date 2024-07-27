@@ -208,5 +208,5 @@ document.getElementById('bookingForm').addEventListener('submit', (event) => {
     const date = document.getElementById('date').value;
     const period = document.getElementById('period').value;
 
-    bookIctLab(room, date, period, name);
+    bookIctLab(date, period, name);
 });
