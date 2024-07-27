@@ -80,7 +80,7 @@ function setMinDate() {
 function saveToSheet(name, room, date, period, action) {
     const data = new URLSearchParams();
     data.append('name', name);
-    data.append('room', room);
+    data.append('room', 'Science Lab');
     data.append('date', formatDate(date));
     data.append('period', period);
     data.append('status', action);
