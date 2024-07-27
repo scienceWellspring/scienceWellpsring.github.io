@@ -205,7 +205,6 @@ document.getElementById('bookingForm').addEventListener('submit', (event) => {
     event.preventDefault();
 
     const name = document.getElementById('name').value;
-    const room = document.getElementById('room').value;
     const date = document.getElementById('date').value;
     const period = document.getElementById('period').value;
 
