@@ -1,15 +1,12 @@
 const API_KEY = 'AIzaSyDfGOC10awrLoJJZnDxexGNqEp5Tac7Eyk';
-const SHEET_ID = '15EpnaUc9XztfPNtPAYAjorv2j87Lb9sIlAFdTpS1mJE';
-const SHEET_NAME = 'ICT_lab';
-const ADMIN_SHEET_NAME = 'admin_account_data';
-const Deployment_ID = 'AKfycbz6xxBlJlw1ZrCCNa79dRevGlJCBrZZB_JxKN53BJijOxvWLm_8mQHITGuW0yD9uART';
+const SHEET_ID = '1DQxmGwWePpeKlU8nQ-IW9R1C4d_vR2Gn6utKtdC653s';
+const SHEET_NAME = 'science_lab';
+const ADMIN_SHEET_NAME = 'admin';
+const Deployment_ID = 'AKfycbzaDG--hTFVdkR3vSJYmSjwLjKyCVqM4yJKnfYxPBzBKbEf3Jz7U4ocxCxISKg2xORq';
 const SHEET_URL = `https://script.google.com/macros/s/${Deployment_ID}/exec`;
 
 const roomBookings = [
-    { room: 'ICT Lab 1', bookings: [] },
-    { room: 'ICT Lab 2', bookings: [] },
-    { room: 'ICT Lab 3', bookings: [] },
-    { room: 'ICT Lab 4', bookings: [] }
+    { room: 'Science Lab', bookings: [] },
 ];
 
 let bookedIctLabs = [];

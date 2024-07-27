@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICT Lab Reservation System</title>
+  <title>Science Lab Reservation System</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1>ICT Lab Reservation System</h1>
-  </header>
+    <h1>Science Lab Reservation System</h1>
+  </header> 
 
   <main>
     <section class="table-section">
@@ -17,7 +17,7 @@
       <table>
         <thead>
           <tr>
-            <th>ICT Lab</th>
+            <th>Science Lab</th>
             <th>Monday</th>
             <th>Tuesday</th>
             <th>Wednesday</th>
@@ -32,7 +32,7 @@
     </section>
 
     <section class="form-section">
-      <h2>Book an ICT Lab</h2>
+      <h2>Book a Science Lab</h2>
       <form id="bookingForm">
         <div class="form-group">
           <label for="name">Name:</label>
@@ -40,13 +40,10 @@
         </div>
 
         <div class="form-group">
-          <label for="room">ICT Lab:</label>
+          <label for="room">Science Lab:</label>
           <select id="room" name="room" required>
-            <option value="">Select an ICT Lab</option>
-            <option value="ICT Lab 1">ICT Lab 1</option>
-            <option value="ICT Lab 2">ICT Lab 2</option>
-            <option value="ICT Lab 3">ICT Lab 3</option>
-            <option value="ICT Lab 4">ICT Lab 4</option>
+            <option value="">Select A Lab</option>
+            <option value="Science Lab">Science Lab</option>
           </select>
         </div>
 
@@ -66,24 +63,24 @@
           </select>
         </div>
 
-        <button type="submit">Book ICT Lab</button>
+        <button type="submit">Book Science Lab</button>
       </form>
     </section>
 
     <section class="table-section">
-      <h2>Booked ICT Labs</h2>
+      <h2>Booked Science Labs</h2>
       <table id="bookedTable">
         <thead>
           <tr>
             <th>Name</th>
-            <th>ICT Lab</th>
+            <th>Science Lab</th>
             <th>Date</th>
             <th>Period</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Booked ICT Labs will be added dynamically here -->
+          <!-- Booked Science Labs will be added dynamically here -->
         </tbody>
       </table>
     </section>
