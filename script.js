@@ -2,7 +2,7 @@ const API_KEY = 'AIzaSyDfGOC10awrLoJJZnDxexGNqEp5Tac7Eyk';
 const SHEET_ID = '1DQxmGwWePpeKlU8nQ-IW9R1C4d_vR2Gn6utKtdC653s';
 const SHEET_NAME = 'science_lab';
 const ADMIN_SHEET_NAME = 'admin';
-const Deployment_ID = 'AKfycbzaDG--hTFVdkR3vSJYmSjwLjKyCVqM4yJKnfYxPBzBKbEf3Jz7U4ocxCxISKg2xORq';
+const Deployment_ID = 'AKfycbzHkgfng-6bzZG1ZgjFdXsVOsWjBd3HSGcB6tDb22pX3EC60mqsSraDrPgp_etVvDN2';
 const SHEET_URL = `https://script.google.com/macros/s/${Deployment_ID}/exec`;
 
 const roomBookings = [
